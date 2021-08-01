@@ -1,0 +1,62 @@
+# Dockerfile has been added in all micro-services, you need to dockerize all micro-services and add docker-compose.yml file
+version: "3.9"
+services:
+    mysqldb:
+        image: mysql:latest
+        container_name: mysql_container
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: userAuth
+    mongodb:
+        image: mongo:latest
+        container_name: mongodb_container
+    userservice:
+        image: 9618072179/UserService:v1
+        container_name: UserService
+        ports:
+            - 8094:8085
+        environment:
+            MONGO_URI: mongodb://mongodb:27017/userdb
+        depends_on:
+            - mysqldb
+        restart: always
+    userAuthService:
+        image: 9618072179/UserAuthenticationService:v1
+        container_name: UserAuthenticationService
+        ports:
+            - 8093:8089
+        environment:
+            MYSQL_URL: jdbc:mysql://mysqldb:3306/userAuth
+        depends_on:
+            - mongodb
+        restart: always
+    categoryservice:
+        image: 9618072179/CategoryService:v1
+        container_name: CategoryService
+        ports:
+            - 8092:8083
+        environment:
+            MONGO_URI: mongodb://mongodb:27017/categorydb
+        depends_on:
+            - mongodb
+        restart: always
+    noteservice:
+        image: 9618072179/NoteService:v1
+        container_name: NoteService
+        ports:
+            - 8091:8082
+        environment:
+            MONGO_URI: mongodb://mongodb:27017/notedb
+        depends_on:
+            - mongodb
+        restart: always
+    reminderservice:
+        image: 9618072179/ReminderService:v1
+        container_name: ReminderService
+        ports:
+            - 8090:8081
+        environment:
+            MONGO_URI: mongodb://mongodb:27017/remainderdb
+        depends_on:
+            - mongodb
+        restart: always
